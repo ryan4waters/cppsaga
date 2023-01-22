@@ -23,7 +23,7 @@ int main()
     int a = 1, b = 2;
     Fun_Ptr myFunPtr[] = {func0, func1, func2};
     for (int i = 0; i < sizeof(myFunPtr) / sizeof(Fun_Ptr); ++i) {
-        cout << myFunPtr[i](a, b) << " ";
+        printf("%d ", myFunPtr[i](a, b));
     }
 
     return 0;
