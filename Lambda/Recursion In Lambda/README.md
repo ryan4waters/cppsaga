@@ -14,7 +14,7 @@ What you need to read this article:
 
 We all know that if you try to call recursively in the function body directly like a normal function, there will be a syntax error, and neither reference capture nor value capture can be used (I won’t go into details here). So we need something else to implement recursive calls.
 
-![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/directly_call_in_Lambda.png)
+![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/Recursion%20In%20Lambda/figures/directly_call_in_Lambda.png)
 
 ## std::function in C++11
 Taking the Fibonacci sequence as an example, we can use lambda expressions to construct a std::function object as blow:
@@ -30,11 +30,11 @@ int main(int argc, char* argv[])
 }
 ```
 
-![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/function_in_Lambda.png)
+![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/Recursion%20In%20Lambda/figures/function_in_Lambda.png)
 
 But obviously, this method is not so elegant from the point of view of the declaration form. From the point of view of the writing form, the function signature written by the lambda on the right has to be copied again on the left, which is too cumbersome and ugly. In addition, using closures to initialize std::function objects does not essentially solve the problem of lambda recursive calls. It just avoids this problem, but introduces many new problems. It is not a zero-overhead abstraction. In addition, he still has some functional defects. For example, we try to implement a Fibonacci sequence of tail recursive calls:
 
-![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/recursion_by_function.png)
+![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/Recursion%20In%20Lambda/figures/recursion_by_function.png)
 
 Obviously, for lambda expressions with default parameters, std::function cannot realize all its features.
 
@@ -56,7 +56,7 @@ int main() {
 }
 ```
 
-![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/currying.png)
+![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/Recursion%20In%20Lambda/figures/currying.png)
 
 ### Directly input (commonly used for LeetCode)
 
@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
 }
 ```
 
-![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/simplified_pass.png)
+![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/Recursion%20In%20Lambda/figures/simplified_pass.png)
 
 ### Pack
 
@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
 }
 ```
 
-![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/pack.png)
+![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/Recursion%20In%20Lambda/figures/pack.png)
 
 But this is actually a bit bad, that is, we only need one `fib`, but there is an extra `f`, which pollutes the namespace, so how to solve it? It is easier to think of directly defining it inside the function body of `fib`:
 
@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
 }
 ```
 
-![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/f_inside_fib.png)
+![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/Recursion%20In%20Lambda/figures/f_inside_fib.png)
 
 But it is obvious that every time we call `fib`, we have to re-initialize `f`. If the compiler optimization is not considered, there will be a performance overhead which is plain to see, so here we can use the same initializer from C++14 capture list, so that `f` will only be initialized when `fib` is initialized:
 
@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
 }
 ```
 
-![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/f_in_capture_list.png)
+![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/Recursion%20In%20Lambda/figures/f_in_capture_list.png)
 
 ### About Return Type infer
 
@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
 }
 ```
 
-![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/auto_trailing_return_type.png)
+![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/Recursion%20In%20Lambda/figures/auto_trailing_return_type.png)
 
 > cannot deduce the return type of function "lambda [](auto &&self, int n, int i = 0, int num1 = 0, int num2 = 1)->auto [with <auto-1>=const lambda [](auto &&self, int n, int i = 0, int num1 = 0, int num2 = 1)->auto &]" (declared at line 5); it has not been defined
 >
@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
 }
 ```
 
-![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/trailing_return_type.png)
+![image](https://github.com/ryan4waters/cppsaga/blob/main/Lambda/Recursion%20In%20Lambda/figures/trailing_return_type.png)
 
 ## Use Deducing this to realize lambda recursion in C++23
 
