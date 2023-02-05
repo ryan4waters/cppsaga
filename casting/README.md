@@ -25,7 +25,7 @@ In C++,  `const` means that the object or variable it modifies isn't modifiable.
 
 So when can `const_cast` be used? Strictly speaking, `const_cast` is only reasonable if the `const` pointed to content is itself mutable (can be modified).
 
-[References](http://blog.aaronballman.com/2011/06/when-should-you-use- `const_cast` /)
+[References](http://blog.aaronballman.com/2011/06/when-should-you-use-const_cast/)
 
 In most cases, the use of `const_cast` often implies design problems, and the rationality of the code needs to be reviewed!
 
@@ -66,8 +66,11 @@ The output prints:
 It can be seen that after the update operation, there is an inconsistency between `x[0]` pointing to the integer variable value (30) and a (10), although the pointers are the same (below). The data of `x[1]` and `b` are consistent.
 
 * before update: 
+
 ![iamge](https://github.com/ryan4waters/cppsaga/blob/main/casting/figures/before_update.png)
+
 * after update:
+
 ![iamge](https://github.com/ryan4waters/cppsaga/blob/main/casting/figures/after_update.png)
 
 This is because when `a` is a constant (const int), when the compiler prints `*x[0]`, it will directly load the constant value 10 into the register. And when `a` is a non-constant (int), when the compiler prints `*x[0]`, it will print the value pointed to by its real address (my vscode cracks that I can't read register to display figure here, update later).
