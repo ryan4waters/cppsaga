@@ -1,66 +1,103 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#define NO_FAIL_CODE 0
-#define INVALID_VAL 0xFF
-
 typedef enum {
     A_ID = 0,
     B_ID,
-    C_ID
+    C_ID,
+    D_ID
 } Id;
 
-int g_testTable[3] = {0};
+typedef enum {
+    NO_FAIL_CODE = 0,
+    INVALID_VAL = -1
+} ErrorCode;
 
-bool GetNumberById(Id myId)
+int g_testTable[4] = {0};
+
+bool getNumberById(Id myId)
 {
-    int idIndex = myId;
-    return (g_testTable[idIndex] > 0U) ? true : false;
+    return g_testTable[myId] > 0;
 }
 
 typedef bool (*getValFun)(Id myId);
 
 typedef struct {
     int number;
-    getValFun mycallback;
-    Id myId;
+    getValFun callback;
+    Id id;
 } Cfg;
 
 Cfg g_CfgTable[] = {
-    {1, GetNumberById, A_ID},
-    {10, GetNumberById, B_ID},
-    {100, GetNumberById, C_ID}
+    {1, getNumberById, A_ID},
+    {2, getNumberById, B_ID},
+    {3, getNumberById, C_ID},
+    {4, getNumberById, D_ID}
 };
 
-const int g_table_len = sizeof(g_CfgTable) / sizeof(Cfg);
+const size_t g_table_len = sizeof(g_CfgTable) / sizeof(Cfg);
+
+int Get_Number(void)
+{
+    static int oldRetIndex = INVALID_VAL;
+    static int currentIndex = -1;
+
+    for (size_t i = 0; i < g_table_len; ++i) {
+        if (g_CfgTable[i].callback(g_CfgTable[i].id)) {
+            if (i == currentIndex) { 
+                oldRetIndex = i;
+                currentIndex = (currentIndex + 1) % g_table_len;
+                return g_CfgTable[oldRetIndex].number;
+            }
+        }
+    }
+
+    for (size_t i = 0; i < g_table_len; ++i) {
+        size_t searchIndex = (oldRetIndex + 1 + i) % g_table_len;
+        if (g_CfgTable[searchIndex].callback(g_CfgTable[searchIndex].id)) {
+            oldRetIndex = searchIndex;
+            currentIndex = (oldRetIndex + 1) % g_table_len;
+            return g_CfgTable[oldRetIndex].number;
+        }
+    }
+
+    oldRetIndex = INVALID_VAL;
+    currentIndex = 0;
+    return NO_FAIL_CODE;
+}
+
+/*
+static int currentIndex = -1;
+
+int Get_Number(void)
+{
+    for (size_t i = 0; i < g_table_len; ++i) {
+        if (g_CfgTable[(currentIndex + 1 + i) % g_table_len].callback(
+                g_CfgTable[(currentIndex + 1 + i) % g_table_len].id)) {
+            currentIndex = (currentIndex + 1 + i) % g_table_len;
+            return g_CfgTable[currentIndex].number;
+        }
+    }
+
+    currentIndex = -1;
+    return NO_FAIL_CODE;
+}
 
 int Get_Number(void)
 {
     int ret = NO_FAIL_CODE;
-    static int oldRetIndex = INVALID_VAL;
-    int i;
-    bool isNumberExist;
-    Id myId;
-
-    do {
-        isNumberExist = false;
-        for (i = 0U; i < g_table_len; ++i) {
-            myId = g_CfgTable[i].myId;
-            if (g_CfgTable[i].mycallback(myId)) {
-                isNumberExist = true;
-                if ((oldRetIndex == INVALID_VAL) || (i > oldRetIndex)) {
-                    oldRetIndex = i;
-                    return g_CfgTable[oldRetIndex].number;
-                }
-            }
+    for (size_t i = 0; i < g_table_len; ++i) {
+        if (g_CfgTable[(currentIndex + 1 + i) % g_table_len].callback(
+                g_CfgTable[(currentIndex + 1 + i) % g_table_len].id)) {
+            currentIndex = (currentIndex + 1 + i) % g_table_len, ret = g_CfgTable[currentIndex].number;
+            return ret;
         }
-        if (i >= (g_table_len - 1U)) {
-            oldRetIndex = INVALID_VAL;
-        }
-    } while (isNumberExist);
+    }
 
+    currentIndex = -1;
     return ret;
 }
+*/
 
 void PrintFun(void)
 {
@@ -76,15 +113,17 @@ int main()
     PrintFun();
 
     printf("two elements\n");
-    g_testTable[2] = 0;
     g_testTable[0] = 1;
+    g_testTable[2] = 0;
     g_testTable[1] = 1;
+    g_testTable[3] = 1;
     PrintFun();
 
     printf("zero element\n");
-    g_testTable[2] = 0;
     g_testTable[0] = 0;
     g_testTable[1] = 0;
+    g_testTable[2] = 0;
+    g_testTable[3] = 0;
     PrintFun();
 
     return 0;
