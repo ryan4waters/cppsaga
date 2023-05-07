@@ -97,6 +97,22 @@ int Get_Number(void)
     currentIndex = -1;
     return ret;
 }
+
+unsigned int Get_Number(void)
+{
+    unsigned int i, index, result = 0;
+    static unsigned int currentIndex = 0;
+    for (i = 0; i < g_table_len; ++i) {
+        index = (currentIndex + i) % g_table_len;
+        result = g_CfgTable[index].callback(g_CfgTable[index].id);
+        if (result) {
+            currentIndex = (index + 1) % g_table_len; // ensure return in order
+            return g_CfgTable[index].number;
+        }
+    }
+    currentIndex = 0;
+    return NO_FAIL_CODE;
+}
 */
 
 void PrintFun(void)
